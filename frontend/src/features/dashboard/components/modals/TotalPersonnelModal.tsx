@@ -97,13 +97,11 @@ export function TotalPersonnelModal({ isOpen, onClose, employees }: TotalPersonn
       redirectLabel="View Employee Directory"
     >
       {/* Summary Section */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {[
           { label: 'Total', value: stats.total, color: 'text-[#111827]' },
           { label: 'Active', value: stats.active, color: 'text-green-600' },
           { label: 'Inactive', value: stats.inactive, color: 'text-gray-500' },
-          { label: 'Probationary', value: stats.probationary, color: 'text-blue-600' },
-          { label: 'Contractual', value: stats.contractual, color: 'text-orange-600' },
         ].map((s, i) => (
           <div key={i} className="bg-white p-4 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-center items-center text-center">
             <p className="text-[0.625rem] font-black uppercase tracking-wider text-[#6B7280]">{s.label}</p>

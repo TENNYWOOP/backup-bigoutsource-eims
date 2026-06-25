@@ -79,7 +79,7 @@ export function NewHiresModal({ isOpen, onClose, recentHires }: NewHiresModalPro
       redirectLabel="Open Recruitment Module"
     >
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-center items-center text-center">
           <p className="text-xs font-black uppercase tracking-wider text-[#6B7280]">Total New Hires</p>
           <p className="text-4xl font-black mt-2 text-[#10B981]">{stats.total}</p>
@@ -87,10 +87,6 @@ export function NewHiresModal({ isOpen, onClose, recentHires }: NewHiresModalPro
         <div className="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-center items-center text-center">
           <p className="text-xs font-black uppercase tracking-wider text-[#6B7280]">Hires This Week</p>
           <p className="text-4xl font-black mt-2 text-[#3B82F6]">{stats.thisWeek}</p>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-[#E5E7EB] shadow-sm flex flex-col justify-center items-center text-center">
-          <p className="text-xs font-black uppercase tracking-wider text-[#6B7280]">Pending Onboarding</p>
-          <p className="text-4xl font-black mt-2 text-[#F59E0B]">{stats.pending}</p>
         </div>
       </div>
 
