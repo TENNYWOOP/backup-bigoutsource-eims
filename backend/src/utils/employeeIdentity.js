@@ -40,7 +40,7 @@ export function isValidDepartmentCode(code = '') {
   return /^[a-z]{2,3}$/.test(String(code));
 }
 
-const KNOWN_SUFFIXES = new Set(['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv', 'v', 'md', 'm.d.', 'phd', 'ph.d.', 'esq', 'esq.']);
+const KNOWN_SUFFIXES = new Set(['jr', 'jr.', 'sr', 'sr.', 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'md', 'm.d.', 'phd', 'ph.d.', 'esq', 'esq.']);
 
 function formatEmployeeRecordName(firstName = '', middleName = '', lastName = '', suffix = '') {
   const first = String(firstName || '').trim().replace(/\u00A0/g, ' ');
@@ -70,6 +70,8 @@ export function parseEmployeeName(data = {}) {
 
   const fullNameRaw = String(data.fullName || data.name || '').trim();
   
+  let parsed = null;
+
   if (fullNameRaw.includes(',')) {
     const [lastName, rest] = fullNameRaw.split(',').map(s => s.trim());
     const restParts = rest.split(/ +/).filter(Boolean);
@@ -78,65 +80,67 @@ export function parseEmployeeName(data = {}) {
     if (restParts.length === 1 && KNOWN_SUFFIXES.has(restParts[0].toLowerCase())) {
       const suffix = restParts[0];
       const previousParts = lastName.split(/ +/).filter(Boolean);
-      return {
+      parsed = {
         firstName: (previousParts[0] || '').replace(/\u00A0/g, ' '),
         middleName: previousParts.slice(1, -1).join(' ').replace(/\u00A0/g, ' '),
         lastName: (previousParts[previousParts.length - 1] || '').replace(/\u00A0/g, ' '),
         suffix: suffix,
-        fullName: fullNameRaw
       };
-    }
-
-    if (restParts.length === 1) {
-      return { 
+    } else if (restParts.length === 1) {
+      parsed = { 
         firstName: restParts[0].replace(/\u00A0/g, ' '), 
         middleName: '', 
         lastName: lastName.replace(/\u00A0/g, ' '),
         suffix: '',
-        fullName: fullNameRaw
+      };
+    } else {
+      let suffix = '';
+      const possibleSuffix = restParts[restParts.length - 1];
+      if (possibleSuffix && KNOWN_SUFFIXES.has(possibleSuffix.toLowerCase())) {
+        suffix = restParts.pop();
+      }
+
+      parsed = {
+        firstName: restParts.slice(0, -1).join(' ').replace(/\u00A0/g, ' '),
+        middleName: (restParts[restParts.length - 1] || '').replace(/\u00A0/g, ' '),
+        lastName: lastName.replace(/\u00A0/g, ' '),
+        suffix: suffix,
       };
     }
-    
+  } else {
+    const parts = fullNameRaw.split(/ +/).filter(Boolean);
+
     let suffix = '';
-    const possibleSuffix = restParts[restParts.length - 1];
-    if (possibleSuffix && KNOWN_SUFFIXES.has(possibleSuffix.toLowerCase())) {
-      suffix = restParts.pop();
+    const lastPart = parts[parts.length - 1];
+    if (lastPart && KNOWN_SUFFIXES.has(lastPart.toLowerCase())) {
+      suffix = parts.pop();
     }
 
-    return {
-      firstName: restParts.slice(0, -1).join(' ').replace(/\u00A0/g, ' '),
-      middleName: (restParts[restParts.length - 1] || '').replace(/\u00A0/g, ' '),
-      lastName: lastName.replace(/\u00A0/g, ' '),
-      suffix: suffix,
-      fullName: fullNameRaw
-    };
+    if (parts.length <= 1) {
+      parsed = {
+        firstName: (parts[0] || '').replace(/\u00A0/g, ' '),
+        middleName: '',
+        lastName: '',
+        suffix,
+      };
+    } else {
+      parsed = {
+        firstName: parts[0].replace(/\u00A0/g, ' '),
+        middleName: parts.slice(1, -1).join(' ').replace(/\u00A0/g, ' '),
+        lastName: parts[parts.length - 1].replace(/\u00A0/g, ' '),
+        suffix,
+      };
+    }
   }
 
-  const parts = fullNameRaw.split(/ +/).filter(Boolean);
-
-  let suffix = '';
-  const lastPart = parts[parts.length - 1];
-  if (lastPart && KNOWN_SUFFIXES.has(lastPart.toLowerCase())) {
-    suffix = parts.pop();
+  if (data.suffix !== undefined) {
+    parsed.suffix = suffixRaw;
+    parsed.fullName = formatEmployeeRecordName(parsed.firstName, parsed.middleName, parsed.lastName, parsed.suffix);
+  } else {
+    parsed.fullName = fullNameRaw;
   }
 
-  if (parts.length <= 1) {
-    return {
-      firstName: (parts[0] || '').replace(/\u00A0/g, ' '),
-      middleName: '',
-      lastName: '',
-      suffix,
-      fullName: fullNameRaw,
-    };
-  }
-
-  return {
-    firstName: parts[0].replace(/\u00A0/g, ' '),
-    middleName: parts.slice(1, -1).join(' ').replace(/\u00A0/g, ' '),
-    lastName: parts[parts.length - 1].replace(/\u00A0/g, ' '),
-    suffix,
-    fullName: fullNameRaw,
-  };
+  return parsed;
 }
 
 export function buildLmsUsernameBase(name) {

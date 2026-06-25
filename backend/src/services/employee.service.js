@@ -33,6 +33,7 @@ const trackedFields = [
   'esetStatus',
   'activityWatchStatus',
   'isArchived',
+  'suffix',
 ];
 
 function localEmailIdentifier(email = '') {
@@ -54,6 +55,7 @@ function generatedFieldsChanged(data = {}) {
     'last_name',
     'fullName',
     'name',
+    'suffix',
     'accountAssignment',
     'account',
     'internalDepartmentId',
